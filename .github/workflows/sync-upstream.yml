@@ -1,0 +1,24 @@
+name: Sync Fork with Upstream Branch
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # 每天运行一次，在每天的午夜0点执行
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your fork
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # 使用secrets中的token来有权限推送更改到你的仓库
+          ref: master  # 确保你在正确的分支上工作
+      - name: Sync fork with upstream
+        run: |
+          git config user.name "gh4zw"  # 设置用户名，用于提交信息
+          git config user.email "gozhome@163.com"  # 设置邮箱，用于提交信息
+          git fetch upstream
+          git checkout master
+          git merge upstream/master --ff-only  # 或者使用 git pull --rebase upstream master 来使用rebase方式合并
+          git push origin master  # 推送到你的GitHub仓库的master分支
